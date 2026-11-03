@@ -1,10 +1,10 @@
 # agents-product-tester-squad
 
-Bộ **agent squad cho vị trí Product Tester** dành cho [Claude Code](https://code.claude.com): 11 agent kiểm thử chuyên biệt, 13 lệnh workflow và 5 skill (kèm script Playwright chạy được ngay), làm việc chung trên một workspace `.qa/` với định dạng bàn giao (handoff) thống nhất.
+A **product tester agent squad** for [Claude Code](https://code.claude.com): 11 specialized testing agents, 13 workflow commands and 5 skills (including ready-to-run Playwright scripts), all working on a shared `.qa/` workspace with a common handoff format.
 
-> Plugin name: **`tester-squad`** — dùng chung được với plugin `dev-squad`: tester tìm và báo lỗi, bug đã xác nhận được chuyển cho `dev-squad:debugger` / `dev-squad:developer` để sửa.
+> Plugin name: **`tester-squad`**. It works alongside the `dev-squad` plugin: testers find and report bugs, and confirmed bugs are handed to `dev-squad:debugger` / `dev-squad:developer` for fixing.
 
-## Cài đặt
+## Installation
 
 ```bash
 /plugin marketplace add quocthai179/agents-product-tester-squad
@@ -14,63 +14,63 @@ Bộ **agent squad cho vị trí Product Tester** dành cho [Claude Code](https:
 /plugin install tester-squad@agents-product-tester-squad
 ```
 
-Trên Claude Code 2.1.275 trở lên có thể cài trong một bước:
+On Claude Code 2.1.275 or later you can install in one step:
 
 ```bash
 /plugin install tester-squad --marketplace quocthai179/agents-product-tester-squad
 ```
 
-Chạy cả phiên với Test Lead làm agent chính:
+Run a whole session with the test lead as the main agent:
 
 ```bash
 claude --agent tester-squad:test-lead
 ```
 
-## Đội hình (11 agent)
+## The squad (11 agents)
 
-| Agent | Vai trò | Đầu ra chính |
+| Agent | Role | Main output |
 |---|---|---|
-| `test-lead` | Trưởng nhóm kiểm thử: đánh giá rủi ro, chọn pipeline, giao việc, kiểm tra bằng chứng, kết luận | Kế hoạch điều phối, tổng kết |
-| `test-analyst` | Review yêu cầu/PRD (static testing), điều kiện kiểm thử, phân tích rủi ro, test strategy/plan | `.qa/analysis/`, `.qa/plans/` |
-| `test-designer` | Thiết kế test case bằng EP, BVA, bảng quyết định, chuyển trạng thái, pairwise; test data; traceability | `.qa/cases/` (+ CSV, `.steps.json`) |
-| `exploratory-tester` | Kiểm thử khám phá theo charter, heuristics, tours; chạy sản phẩm thật trên trình duyệt | `.qa/sessions/` |
-| `functional-tester` | Thực thi test case, smoke/regression, verify bug fix, chạy suite tự động có sẵn | `.qa/runs/` |
-| `api-tester` | Kiểm thử API theo contract: validation, auth/authz (IDOR), status code, idempotency, tương thích | `.qa/runs/…-api-…`, `.qa/api/` |
-| `ux-accessibility-tester` | Usability (Nielsen), WCAG 2.2 AA (axe-core + kiểm tra thủ công), nội dung, i18n/l10n tiếng Việt, responsive | `.qa/reports/…-ux-a11y-…` |
-| `nonfunctional-tester` | Hiệu năng cảm nhận (LCP/INP/CLS), load smoke, security smoke, độ tin cậy/khôi phục, tương thích | `.qa/reports/…-nfr-…` |
-| `automation-engineer` | Tự động hoá regression (Playwright/Cypress/API) trong framework của dự án, khử flaky | Test code + `.qa/reports/…-automation-…` |
-| `bug-triager` | Tái hiện, cô lập, chống trùng, phân loại severity/priority, viết bug report, quản lý bug register, tạo ticket (khi được yêu cầu) | `.qa/bugs/`, `.qa/BUGS.md` |
-| `test-reporter` | Test summary report, metrics, khuyến nghị GO / GO WITH RISKS / NO-GO, tổng hợp phản hồi UAT/beta | `.qa/reports/…-summary-…` |
+| `test-lead` | Test lead: assesses risk, picks the pipeline, dispatches work, checks evidence, gives the verdict | Dispatch plan, final summary |
+| `test-analyst` | Reviews requirements/PRDs (static testing), derives test conditions, analyses product risk, writes the test strategy/plan | `.qa/analysis/`, `.qa/plans/` |
+| `test-designer` | Designs test cases with EP, BVA, decision tables, state transitions and pairwise; test data; traceability | `.qa/cases/` (+ CSV, `.steps.json`) |
+| `exploratory-tester` | Charter-based exploratory testing with heuristics and tours, on the real product in a browser | `.qa/sessions/` |
+| `functional-tester` | Executes test cases, smoke/regression runs, bug fix verification, runs existing automated suites | `.qa/runs/` |
+| `api-tester` | Contract-based API testing: validation, authN/authZ (IDOR), status codes, idempotency, compatibility | `.qa/runs/…-api-…`, `.qa/api/` |
+| `ux-accessibility-tester` | Usability (Nielsen), WCAG 2.2 AA (axe-core + manual checks), content, i18n/l10n, responsive | `.qa/reports/…-ux-a11y-…` |
+| `nonfunctional-tester` | Perceived performance (LCP/INP/CLS), light load smoke, security smoke, reliability/recovery, compatibility | `.qa/reports/…-nfr-…` |
+| `automation-engineer` | Automated regression (Playwright/Cypress/API) in the project's own framework, de-flaking | Test code + `.qa/reports/…-automation-…` |
+| `bug-triager` | Reproduces, isolates, de-duplicates and classifies bugs (severity/priority), writes bug reports, maintains the bug register, files tickets (only when asked) | `.qa/bugs/`, `.qa/BUGS.md` |
+| `test-reporter` | Test summary reports, metrics, GO / GO WITH RISKS / NO-GO recommendation, UAT/beta feedback synthesis | `.qa/reports/…-summary-…` |
 
-## Lệnh workflow
+## Workflow commands
 
-| Lệnh | Việc làm | Pipeline |
+| Command | What it does | Pipeline |
 |---|---|---|
-| `/tester-squad:squad <yêu cầu>` | Giao bất kỳ việc kiểm thử nào; Test Lead tự chọn pipeline | test-lead quyết định |
-| `/tester-squad:review-requirements <PRD>` | Soát yêu cầu trước khi code: mơ hồ, thiếu, mâu thuẫn, không test được | analyst |
-| `/tester-squad:test-plan <feature>` | Phân tích rủi ro → test plan → test case + traceability | analyst → designer |
-| `/tester-squad:test-feature <feature>` | Kiểm thử trọn vẹn một tính năng | analyst → designer → functional ∥ exploratory ∥ api ∥ ux-a11y → triager → reporter |
-| `/tester-squad:explore <khu vực>` | 1–3 phiên exploratory song song rồi triage bug | exploratory ×N → triager |
-| `/tester-squad:regression <build>` | Smoke + regression (suite tự động + case thủ công) | automation ∥ functional → triager → reporter |
-| `/tester-squad:bug-report <mô tả>` | Tái hiện và viết bug report chuẩn (thêm "file it" để tạo ticket) | triager |
-| `/tester-squad:verify-fix <bug IDs>` | Retest bug đã sửa + regression lân cận | functional → triager |
-| `/tester-squad:a11y-audit <URLs>` | Audit UX, accessibility WCAG 2.2 AA, bản địa hoá, responsive | ux-a11y → triager |
-| `/tester-squad:api-test <spec>` | Kiểm thử API theo contract, tạo bộ test chạy lại được | api → triager |
-| `/tester-squad:automate <cases>` | Chuyển test case ổn định thành test tự động | (designer) → automation |
-| `/tester-squad:release-signoff <version>` | Đánh giá sẵn sàng phát hành, ra khuyến nghị GO/NO-GO | functional ∥ automation ∥ nfr ∥ ux-a11y → triager → reporter |
-| `/tester-squad:test-report [summary\|status\|feedback]` | Báo cáo tổng kết / status hằng ngày / tổng hợp phản hồi | reporter |
+| `/tester-squad:squad <request>` | Hand any testing request to the squad; the test lead picks the pipeline | test-lead decides |
+| `/tester-squad:review-requirements <PRD>` | Review requirements before coding: ambiguous, incomplete, inconsistent, untestable | analyst |
+| `/tester-squad:test-plan <feature>` | Risk analysis → test plan → test cases + traceability | analyst → designer |
+| `/tester-squad:test-feature <feature>` | Test a feature end to end | analyst → designer → functional ∥ exploratory ∥ api ∥ ux-a11y → triager → reporter |
+| `/tester-squad:explore <area>` | 1–3 parallel exploratory sessions, then bug triage | exploratory ×N → triager |
+| `/tester-squad:regression <build>` | Smoke + regression (automated suites + manual cases) | automation ∥ functional → triager → reporter |
+| `/tester-squad:bug-report <description>` | Reproduce and write a proper bug report (add "file it" to create a ticket) | triager |
+| `/tester-squad:verify-fix <bug IDs>` | Retest fixed bugs + nearby regression | functional → triager |
+| `/tester-squad:a11y-audit <URLs>` | UX, WCAG 2.2 AA accessibility, localisation and responsive audit | ux-a11y → triager |
+| `/tester-squad:api-test <spec>` | Contract-based API testing with a re-runnable test collection | api → triager |
+| `/tester-squad:automate <cases>` | Turn stable test cases into automated tests | (designer) → automation |
+| `/tester-squad:release-signoff <version>` | Release readiness assessment with a GO/NO-GO recommendation | functional ∥ automation ∥ nfr ∥ ux-a11y → triager → reporter |
+| `/tester-squad:test-report [summary\|status\|feedback]` | Test summary / daily status / feedback synthesis | reporter |
 
 ## Skills
 
-| Skill | Nội dung |
+| Skill | Contents |
 |---|---|
-| `tester-playbook` | Đội hình, pipeline, mức độ test theo rủi ro, cách viết brief, cấu trúc `.qa/`, handoff |
-| `test-design-techniques` | EP, BVA, decision table, state transition, pairwise, use case, test data, checklist test case + **`pairwise.py`** (sinh bộ tổ hợp all-pairs có ràng buộc; ví dụ: 15 dòng thay cho 288) |
-| `exploratory-heuristics` | Charter & session-based testing, SFDPOT, FEW HICCUPPS, tours, cheat sheet dữ liệu tấn công (có tiếng Việt, số điện thoại VN, tiền VND, ngày tháng), ý tưởng test web/mobile |
-| `bug-reporting` | Mẫu bug report, công thức tiêu đề, ma trận severity/priority, checklist tái hiện, xử lý cannot-reproduce/regression/lỗ hổng bảo mật |
-| `web-testing-toolkit` | **`probe.js`**: screenshot đa viewport/trình duyệt, console error, request lỗi, 4xx/5xx, ảnh hỏng, tràn ngang, TTFB/LCP/CLS, quét axe-core. **`run_steps.js`**: chạy test case khai báo bằng JSON, pass/fail từng bước, screenshot khi fail, secret lấy từ biến môi trường. Kèm snippet Playwright: đăng nhập lưu state, giả lập mạng chậm, mock lỗi backend, emulate thiết bị, trace |
+| `tester-playbook` | Roster, pipelines, risk-based test depth, how to write briefs, `.qa/` layout, handoff format |
+| `test-design-techniques` | EP, BVA, decision tables, state transitions, pairwise, use cases, test data, test case checklist + **`pairwise.py`** (constrained all-pairs generator; example: 15 rows instead of 288) |
+| `exploratory-heuristics` | Charters and session-based testing, SFDPOT, FEW HICCUPPS, tours, attack-input cheat sheet (including Vietnamese text, VN phone numbers, VND amounts, dates), web/mobile test ideas |
+| `bug-reporting` | Bug report template, title formula, severity/priority matrix, reproduction checklist, handling cannot-reproduce / regressions / security vulnerabilities |
+| `web-testing-toolkit` | **`probe.js`**: screenshots across viewports/browsers, console errors, failed requests, 4xx/5xx, broken images, horizontal overflow, TTFB/LCP/CLS, axe-core scan. **`run_steps.js`**: runs test cases declared in JSON, per-step pass/fail, screenshots on failure, secrets read from environment variables. Plus Playwright snippets: saved login state, slow network emulation, mocked backend failures, device emulation, traces |
 
-Ví dụ:
+Examples:
 
 ```bash
 node skills/web-testing-toolkit/scripts/probe.js https://staging.example.com/ --viewports 375x812,1440x900 --axe --runs 3
@@ -84,26 +84,28 @@ QA_PASSWORD=*** node skills/web-testing-toolkit/scripts/run_steps.js .qa/cases/l
 python3 skills/test-design-techniques/scripts/pairwise.py skills/test-design-techniques/scripts/example-params.json
 ```
 
-## Cách dùng (ví dụ)
+## Usage examples
 
 ```text
-/tester-squad:test-feature Tính năng áp mã giảm giá ở giỏ hàng. App chạy ở http://localhost:3000 (npm run dev),
-tài khoản test trong biến QA_USER/QA_PASSWORD, yêu cầu ở docs/prd/voucher.md
+/tester-squad:test-feature Voucher codes in the shopping cart. The app runs at http://localhost:3000 (npm run dev),
+test account in QA_USER/QA_PASSWORD, requirements in docs/prd/voucher.md
 ```
 
 ```text
-/tester-squad:explore Trang thanh toán trên staging https://staging.shop.vn, 2 charter: dữ liệu nhập & gián đoạn mạng
+/tester-squad:explore Checkout page on staging https://staging.shop.example, 2 charters: input data & network interruptions
 ```
 
 ```text
-/tester-squad:release-signoff v2.4.0 trên https://staging.shop.vn, changelog ở CHANGELOG.md
+/tester-squad:release-signoff v2.4.0 on https://staging.shop.example, changelog in CHANGELOG.md
 ```
 
 ```text
-Dùng tester squad review PRD này giúp tôi: docs/prd/loyalty-points.md
+Use the tester squad to review this PRD: docs/prd/loyalty-points.md
 ```
 
-## Workspace `.qa/`
+Agents reply in the language you write in (for example Vietnamese) and keep IDs, code and file names in English.
+
+## The `.qa/` workspace
 
 ```
 .qa/
@@ -112,14 +114,14 @@ Dùng tester squad review PRD này giúp tôi: docs/prd/loyalty-points.md
 ├── cases/<slug>.md                 # test-designer (+ <slug>/<TC-ID>.steps.json)
 ├── sessions/<date>-<slug>.md       # exploratory-tester
 ├── runs/<date>-<slug>.md           # functional-tester, api-tester
-├── api/<slug>/                     # api-tester (khi dự án chưa có framework test API)
+├── api/<slug>/                     # api-tester (when the project has no API test framework)
 ├── bugs/BUG-<NNN>-<slug>.md        # bug-triager
 ├── BUGS.md                         # bug register
-├── evidence/<date>-<slug>/         # screenshot, probe, log (thường git-ignore)
+├── evidence/<date>-<slug>/         # screenshots, probe output, logs (usually git-ignored)
 └── reports/<date>-<type>-<slug>.md # ux-a11y, nfr, automation, summary, status, feedback
 ```
 
-Mỗi agent kết thúc bằng khối:
+Every agent ends its response with:
 
 ```
 ### Handoff
@@ -129,27 +131,26 @@ Mỗi agent kết thúc bằng khối:
 - Risks / open questions: <...>
 ```
 
-## Nguyên tắc an toàn của squad
+## Squad safety rules
 
-- **Có bằng chứng mới tính**: mọi kết luận pass/fail phải kèm output lệnh, screenshot hoặc log.
-- Chỉ test môi trường được phép (local/dev/staging hoặc mục tiêu người dùng chỉ định). Không chạy load test, fuzzing hay security probe trên production/hệ thống bên thứ ba khi chưa được đồng ý rõ ràng.
-- Không dùng dữ liệu cá nhân thật của khách hàng làm test data; secret chỉ đặt trong biến môi trường.
-- Tester không sửa code sản phẩm; không tạo ticket, commit, push hay gửi tin nhắn khi người dùng chưa yêu cầu.
-- Lỗ hổng bảo mật nghi ngờ được đánh dấu confidential, không đưa lên tracker công khai.
-- Agent trả lời bằng ngôn ngữ của người dùng (tiếng Việt), giữ ID/code/tên file bằng tiếng Anh.
+- **Evidence or it didn't happen**: every pass/fail claim comes with command output, a screenshot or a log excerpt.
+- Test only authorized environments (local/dev/staging or a target the user named). No load tests, fuzzing or security probes against production or third-party systems without explicit approval.
+- Never use real customers' personal data as test data; secrets live only in environment variables.
+- Testers do not change product code, and do not file tickets, commit, push or post messages unless the user asks.
+- Suspected security vulnerabilities are marked confidential and never posted to public trackers.
 
-## Cấu trúc repo
+## Repository layout
 
 ```
 .claude-plugin/        plugin.json, marketplace.json
-agents/                11 agent (.md với frontmatter)
-commands/              13 lệnh workflow
-skills/                5 skill (+ scripts)
-tests/                 smoke test + trang demo có lỗi cài sẵn
-tools/validate_plugin.py   kiểm tra tính nhất quán của plugin
+agents/                11 agents (.md with frontmatter)
+commands/              13 workflow commands
+skills/                5 skills (+ scripts)
+tests/                 smoke tests + a demo page with planted defects
+tools/validate_plugin.py   plugin consistency checks
 ```
 
-## Phát triển
+## Development
 
 ```bash
 python3 tools/validate_plugin.py
@@ -159,8 +160,8 @@ python3 tools/validate_plugin.py
 bash tests/smoke.sh
 ```
 
-`tests/smoke.sh` kiểm tra manifest/agent/command/skill, độ phủ của `pairwise.py`, và (nếu có Playwright) chạy `run_steps.js` + `probe.js` trên trang demo có lỗi cài sẵn để chắc chắn công cụ phát hiện đúng. CI chạy cùng script này trong `.github/workflows/validate.yml`.
+`tests/smoke.sh` checks the manifests, agents, commands and skills, verifies `pairwise.py` coverage, and (when Playwright is available) runs `run_steps.js` and `probe.js` against a demo page with planted defects to make sure the tools detect them. CI runs the same script in `.github/workflows/validate.yml`.
 
 ## License
 
-MIT — xem [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE).
