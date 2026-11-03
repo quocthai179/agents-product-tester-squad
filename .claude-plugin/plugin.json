@@ -1,0 +1,12 @@
+{
+  "name": "tester-squad",
+  "version": "1.0.0",
+  "description": "A product tester squad of 11 specialized agents (test lead, test analyst, test designer, exploratory tester, functional tester, API tester, UX & accessibility tester, non-functional tester, test automation engineer, bug triager, test reporter) with workflow commands and testing skills.",
+  "author": {
+    "name": "quocthai179"
+  },
+  "homepage": "https://github.com/quocthai179/agents-product-tester-squad",
+  "repository": "https://github.com/quocthai179/agents-product-tester-squad",
+  "license": "MIT",
+  "keywords": ["agents", "team", "testing", "qa", "product-tester", "manual-testing", "exploratory-testing", "test-cases", "bug-report", "accessibility", "api-testing", "playwright", "uat", "release-signoff"]
+}

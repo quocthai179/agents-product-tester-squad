@@ -1,0 +1,7 @@
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+# test evidence and auth state produced when trying the toolkit inside this repo
+.qa/evidence/
+.qa/auth.json

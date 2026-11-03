@@ -1,0 +1,17 @@
+{
+  "id": "TC-DEMO-001",
+  "title": "Valid login shows greeting (expected PASS)",
+  "baseUrl": "http://localhost:8765",
+  "locale": "vi-VN",
+  "timezoneId": "Asia/Ho_Chi_Minh",
+  "steps": [
+    { "goto": "/" },
+    { "fill": { "label": "Email" }, "value": "qa@example.test" },
+    { "fill": { "placeholder": "Mật khẩu" }, "value": "${QA_PASSWORD}" },
+    { "click": { "role": "button", "name": "Sign in" } },
+    { "expectText": "Xin chào", "in": { "selector": "#msg" } },
+    { "expectCount": { "selector": "input" }, "count": 2 },
+    { "expectTitle": "/demo/i" },
+    { "screenshot": "after-login" }
+  ]
+}

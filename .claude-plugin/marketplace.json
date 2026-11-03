@@ -1,0 +1,17 @@
+{
+  "name": "agents-product-tester-squad",
+  "owner": {
+    "name": "quocthai179"
+  },
+  "metadata": {
+    "description": "Product tester agent squad for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "tester-squad",
+      "source": "./",
+      "description": "Product tester squad: 11 testing agents, workflow commands and testing skills.",
+      "version": "1.0.0"
+    }
+  ]
+}
