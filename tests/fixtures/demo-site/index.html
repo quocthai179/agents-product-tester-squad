@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Demo shop</title></head>
+<body>
+  <!-- Deliberately flawed page used to check that the toolkit detects problems:
+       missing lang, broken image without alt, low contrast, horizontal overflow, console error. -->
+  <h1>Đăng nhập</h1>
+  <form id="f">
+    <label for="email">Email</label><input id="email" type="email">
+    <input id="password" type="password" placeholder="Mật khẩu">
+    <button type="submit">Sign in</button>
+  </form>
+  <img src="missing.png">
+  <div style="width:2000px;color:#ccc;background:#fff">low contrast wide box</div>
+  <p id="msg"></p>
+  <script>
+    console.error('demo console error');
+    document.getElementById('f').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var ok = document.getElementById('email').value === 'qa@example.test' &&
+               document.getElementById('password').value === 'demo-password';
+      document.getElementById('msg').textContent = ok ? 'Xin chào, QA' : 'Sai thông tin';
+    });
+  </script>
+</body>
+</html>

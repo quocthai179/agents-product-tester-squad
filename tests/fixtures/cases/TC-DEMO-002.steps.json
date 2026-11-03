@@ -1,0 +1,9 @@
+{
+  "id": "TC-DEMO-002",
+  "title": "No console errors on login page (expected FAIL: page logs an error)",
+  "baseUrl": "http://localhost:8765",
+  "steps": [
+    { "goto": "/" },
+    { "expectNoConsoleErrors": true }
+  ]
+}

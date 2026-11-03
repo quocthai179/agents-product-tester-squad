@@ -1,0 +1,14 @@
+{
+  "parameters": {
+    "browser": ["Chrome", "Firefox", "Safari", "Edge"],
+    "os": ["Windows", "macOS", "Android", "iOS"],
+    "role": ["guest", "member", "admin"],
+    "payment": ["card", "e-wallet", "COD"],
+    "lang": ["vi", "en"]
+  },
+  "constraints": [
+    {"browser": "Safari", "os": "Windows"},
+    {"browser": "Safari", "os": "Android"},
+    {"browser": "Edge", "os": "iOS"}
+  ]
+}

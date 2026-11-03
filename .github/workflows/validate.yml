@@ -1,0 +1,23 @@
+name: validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright (Chromium) and axe-core
+        run: |
+          npm install --no-save --no-package-lock playwright@1.49.1 axe-core@4.10.2
+          npx playwright install --with-deps chromium
+      - name: Smoke tests
+        run: bash tests/smoke.sh

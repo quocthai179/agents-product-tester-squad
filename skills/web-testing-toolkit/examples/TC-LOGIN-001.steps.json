@@ -1,0 +1,18 @@
+{
+  "id": "TC-LOGIN-001",
+  "title": "Member can sign in with valid credentials",
+  "baseUrl": "http://localhost:3000",
+  "viewport": { "width": 1280, "height": 800 },
+  "locale": "vi-VN",
+  "timezoneId": "Asia/Ho_Chi_Minh",
+  "steps": [
+    { "goto": "/login" },
+    { "fill": { "label": "Email" }, "value": "qa.member@example.test" },
+    { "fill": { "label": "Mật khẩu" }, "value": "${QA_PASSWORD}" },
+    { "click": { "role": "button", "name": "Đăng nhập" } },
+    { "expectUrl": "/dashboard" },
+    { "expectText": "Xin chào" },
+    { "expectNoConsoleErrors": true },
+    { "screenshot": "signed-in" }
+  ]
+}
